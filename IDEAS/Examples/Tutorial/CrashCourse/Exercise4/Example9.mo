@@ -135,8 +135,8 @@ equation
     annotation (Line(points={{-100,-10},{0,-10},{0,-20}}, color={0,127,255}));
   connect(vavRet1.port_a, rectangularZoneTemplate1.ports[2]) annotation (Line(
         points={{-100,-50},{-34,-50},{-34,-20},{0,-20}}, color={0,127,255}));
-  annotation (Diagram(coordinateSystem(extent={{-280,-100},{280,100}})), Icon(
-        coordinateSystem(extent={{-280,-100},{280,100}})),
+  annotation (Diagram(coordinateSystem(extent={{-100,-100},{100,100}})), Icon(
+        coordinateSystem(extent={{-100,-100},{100,100}})),
     experiment(
       StartTime=10000000,
       StopTime=11000000,
