@@ -11,7 +11,7 @@ model GroundTemperatureResponse
   parameter Integer nClu=5 "Number of clusters for g-function calculation";
   parameter Boolean forceGFunCalc = false
     "Set to true to force the thermal response to be calculated at the start instead of checking whether it has been pre-computed";
-  parameter Buildings.Fluid.Geothermal.Borefields.Data.Borefield.Template borFieDat
+  parameter IDEAS.Fluid.Geothermal.Borefields.Data.Borefield.Template borFieDat
     "Record containing all the parameters of the borefield model"
     annotation (choicesAllMatching=true, Placement(transformation(extent={{-80,-80},{-60,-60}})));
 
@@ -38,7 +38,7 @@ protected
   constant Real lvlBas = 2 "Base for exponential cell growth between levels";
 
   parameter String SHAgfun=
-    Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.ThermalResponseFactors.shaGFunction(
+    IDEAS.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.ThermalResponseFactors.shaGFunction(
       nBor=borFieDat.conDat.nBor,
       cooBor=borFieDat.conDat.cooBor,
       hBor=borFieDat.conDat.hBor,
@@ -53,7 +53,7 @@ protected
   parameter Modelica.Units.SI.Time timFin=(borFieDat.conDat.hBor^2/(9*borFieDat.soiDat.aSoi)) *ttsMax
     "Final time for g-function calculation";
   parameter Integer i(min=1)=
-    Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.countAggregationCells(
+    IDEAS.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.countAggregationCells(
       lvlBas=lvlBas,
       nCel=nCel,
       timFin=timFin,
@@ -96,7 +96,7 @@ initial equation
   U_old = 0;
   derDelTBor0 = 0;
 
-  (nu,rCel) = Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.aggregationCellTimes(
+  (nu,rCel) = IDEAS.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.aggregationCellTimes(
     i=i,
     lvlBas=lvlBas,
     nCel=nCel,
@@ -105,7 +105,7 @@ initial equation
 
   t_start = time;
 
-  kappa = Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.aggregationWeightingFactors(
+  kappa = IDEAS.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.aggregationWeightingFactors(
     i=i,
     nTimTot=nTimTot,
     TStep=timSer,
@@ -113,39 +113,13 @@ initial equation
 
   dTStepdt = kappa[1]/tLoaAgg;
 
-  // --- NEW: conditionally read timSer from a .mat file instead of calculating ---
-  if temResMatInput then
-    //temResMatPath must point to a .mat file that contains a variable named TStep
-    //with dimensions (nTimTot x 2)
-    if Modelica.Utilities.Files.exist(temResMatPath) then
-      // readRealMatrix returns Real[nrow, ncol]
-      timSer =  Modelica.Utilities.Streams.readRealMatrix(
-        fileName=temResMatPath,
-        matrixName="TStep",
-        nrow=nTimTot,
-        ncol=2);
-    else
-      Modelica.Utilities.Streams.error("GroundTemperatureResponse: temResMatInput=true but file not found: " + temResMatPath);
-    end if;
-  else
-    // original behavior: calculate or read (tmp) .mat via the function
-    timSer =  Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.ThermalResponseFactors.temperatureResponseMatrix(
-      nBor=borFieDat.conDat.nBor,
-      cooBor=borFieDat.conDat.cooBor,
-      hBor=borFieDat.conDat.hBor,
-      dBor=borFieDat.conDat.dBor,
-      rBor=borFieDat.conDat.rBor,
-      aSoi=borFieDat.soiDat.aSoi,
-      kSoi=borFieDat.soiDat.kSoi,
-      nSeg=nSeg,
-      nClu=nClu,
-      nTimSho=nTimSho,
-      nTimLon=nTimLon,
-      nTimTot=nTimTot,
-      ttsMax=ttsMax,
-      sha=SHAgfun,
-      forceGFunCalc=forceGFunCalc);
-  end if;
+  // --- NEW: read timSer from a .mat file instead of calculating ---
+  timSer =  Modelica.Utilities.Streams.readRealMatrix(
+    fileName=temResMatPath,
+    matrixName="TStep",
+    nrow=nTimTot,
+    ncol=2);
+
 
 equation
   der(delTBor) = dTStepdt*QBor_flow + derDelTBor0;
@@ -159,7 +133,7 @@ equation
     // Store (U - pre(U_old))/tLoaAgg in QAgg_flow[1], and pre(QAggShi_flow) in the other elements
     QAgg_flow = cat(1, {(U - pre(U_old))/tLoaAgg}, pre(QAggShi_flow[2:end]));
     // Shift loads in aggregation cells
-    (curCel,QAggShi_flow) = Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.shiftAggregationCells(
+    (curCel,QAggShi_flow) = IDEAS.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.shiftAggregationCells(
       i=i,
       QAgg_flow=QAgg_flow,
       rCel=rCel,
@@ -168,7 +142,7 @@ equation
 
     // Determine the temperature change at the next aggregation step (assuming
     // no loads until then)
-    delTBor0 = Buildings.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.temporalSuperposition(
+    delTBor0 = IDEAS.Fluid.Geothermal.Borefields.BaseClasses.HeatTransfer.LoadAggregation.temporalSuperposition(
       i=i,
       QAgg_flow=QAggShi_flow,
       kappa=kappa,
@@ -236,7 +210,6 @@ partial model PartialBorefield
     annotation (Dialog(tab="Advanced", group="g-function"));
 
   // New top-level options to choose an external .mat file
-  parameter Boolean temResMatInput = false "If true, read TStep from temResMatPath";
   parameter String temResMatPath = "" "Path to .mat file (contains variable TStep)";
 
   // General parameters of borefield
@@ -281,7 +254,6 @@ partial model PartialBorefield
     final nClu=nClu,
     final borFieDat=borFieDat,
     final forceGFunCalc=forceGFunCalc,
-    final temResMatInput=temResMatInput,
     final temResMatPath=temResMatPath)
     "Ground temperature response (optionally read from .mat)"
     annotation (Placement(transformation(extent={{20,70},{40,90}})));
@@ -498,7 +470,7 @@ temperature after calculating and/or read (from a previous calculation) the bore
 <li>
 April 9, 2021, by Michael Wetter:<br/>
 Corrected placement of <code>each</code> keyword.<br/>
-See <a href=\"https://github.com/lbl-srg/modelica-buildings/pull/2440\">Buildings, PR #2440</a>.
+See <a href=\"https://github.com/lbl-srg/modelica-IDEAS/pull/2440\">IDEAS, PR #2440</a>.
 </li>
 <li>
 August 25, 2020, by Filip Jorissen:<br/>
@@ -589,159 +561,199 @@ First implementation.
         "Time resolution of load aggregation";
 
       parameter Modelica.Units.SI.Temperature TGro=283.15 "Ground temperature";
-      IDEAS.Fluid.Geothermal.Borefields.BaseClasses.UserMods.OneUTube borFie2UTubPar(
-        redeclare package Medium = Medium,
-        borFieDat=borFie2UTubParDat,
-        tLoaAgg=tLoaAgg,
-        energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-        TExt0_start=TGro)
-        "Borefield with a 2-U-tube connected in parallel borehole configuration"
-        annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
-      IDEAS.Fluid.Sources.MassFlowSource_T sou1(
-        redeclare package Medium = Medium,
-        nPorts=1,
-        use_T_in=false,
-        m_flow=borFie2UTubParDat.conDat.mBorFie_flow_nominal,
-        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,-10},{
-                -72,10}}, rotation=0)));
-      IDEAS.Fluid.Sensors.TemperatureTwoPort T2UTubParIn(
-        redeclare package Medium = Medium,
-        m_flow_nominal=borFie2UTubParDat.conDat.mBorFie_flow_nominal,
-        tau=0)
-        "Inlet temperature of the borefield with 2-UTube in serie configuration"
-        annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
-      IDEAS.Fluid.Sources.Boundary_pT sin1(
-        redeclare package Medium = Medium,
-        use_p_in=false,
-        use_T_in=false,
-        nPorts=1,
-        p=101330,
-        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,-10},{70,
-                10}}, rotation=0)));
-      IDEAS.Fluid.Sensors.TemperatureTwoPort T2UTubParOut(
-        redeclare package Medium = Medium,
-        m_flow_nominal=borFie2UTubParDat.conDat.mBorFie_flow_nominal,
-        tau=0)
-        "Outlet temperature of the borefield with 2-UTube in parallel configuration"
-        annotation (Placement(transformation(extent={{40,-10},{60,10}})));
       parameter IDEAS.Fluid.Geothermal.Borefields.Data.Borefield.Example borFieUTubDat(
         filDat=IDEAS.Fluid.Geothermal.Borefields.Data.Filling.Bentonite(
         steadyState=true),
-        conDat=IDEAS.Fluid.Geothermal.Borefields.Data.Configuration.Example(
-        borCon=IDEAS.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.SingleUTube))
-        annotation (Placement(transformation(extent={{70,-100},{90,-80}})));
+        conDat=IDEAS.Fluid.Geothermal.Borefields.Data.Configuration.Template(
+          borCon = Types.BoreholeConfiguration.SingleUTube,
+          cooBor={{0,0},{6,0},{0,6},{6,6},{12,0},{12,6},{18,0},{18,6}},
+          mBor_flow_nominal=0.3,
+          dp_nominal=5e4,
+          hBor=150.0,
+          rBor=0.075,
+          dBor=4.0,
+          rTub=0.02,
+          kTub=0.5,
+          eTub=0.002,
+          xC=0.05))
+        annotation (Placement(transformation(extent={{70,-92},{90,-72}})));
 
-      IDEAS.Fluid.Geothermal.Borefields.BaseClasses.UserMods.OneUTube borFie2UTubSer(
+      IDEAS.Fluid.Geothermal.Borefields.BaseClasses.UserMods.OneUTube borFieUTubCircularImport(
         redeclare package Medium = Medium,
-        borFieDat=borFie2UTubSerDat,
-        tLoaAgg=tLoaAgg,
-        energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-        TExt0_start=TGro)
-        "Borefield with a 2-U-tube connected in serie borehole configuration"
-        annotation (Placement(transformation(extent={{-10,50},{10,70}})));
-      IDEAS.Fluid.Sources.MassFlowSource_T sou2(
-        redeclare package Medium = Medium,
-        nPorts=1,
-        use_T_in=false,
-        m_flow=borFie2UTubSerDat.conDat.mBorFie_flow_nominal,
-        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,50},{
-                -72,70}},
-                      rotation=0)));
-      IDEAS.Fluid.Sensors.TemperatureTwoPort T2UTubSerIn(
-        redeclare package Medium = Medium,
-        m_flow_nominal=borFie2UTubSerDat.conDat.mBorFie_flow_nominal,
-        tau=0)
-        "Inlet temperature of the borefield with 2-UTube in serie configuration"
-        annotation (Placement(transformation(extent={{-58,50},{-38,70}})));
-      IDEAS.Fluid.Sources.Boundary_pT sin2(
-        redeclare package Medium = Medium,
-        use_p_in=false,
-        use_T_in=false,
-        nPorts=1,
-        p=101330,
-        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,50},{70,
-                70}}, rotation=0)));
-      IDEAS.Fluid.Sensors.TemperatureTwoPort T2UTubSerOut(
-        redeclare package Medium = Medium,
-        m_flow_nominal=borFie2UTubSerDat.conDat.mBorFie_flow_nominal,
-        tau=0)
-        "Outlet temperature of the borefield with 2-UTube in serie configuration"
-        annotation (Placement(transformation(extent={{42,50},{62,70}})));
-      parameter IDEAS.Fluid.Geothermal.Borefields.Data.Borefield.Example borFie2UTubParDat(
-        filDat=IDEAS.Fluid.Geothermal.Borefields.Data.Filling.Bentonite(
-        steadyState=true),
-        conDat=IDEAS.Fluid.Geothermal.Borefields.Data.Configuration.Example(
-        borCon=IDEAS.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeParallel))
-        "Data from the borefield with 2-UTube in parallel borehole configuration"
-        annotation (Placement(transformation(extent={{70,-40},{90,-20}})));
-      IDEAS.Fluid.Geothermal.Borefields.BaseClasses.UserMods.OneUTube borFieUTub(
-        redeclare package Medium = Medium,
+        temResMatPath=Modelica.Utilities.Files.loadResource("modelica://IDEAS/Resources/Data/Fluid/Geothermal/Borefields/HeatTransfer/temperatureResponseMatrix/customTStepInclined2.mat"),
         borFieDat=borFieUTubDat,
         tLoaAgg=tLoaAgg,
         energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
         TExt0_start=TGro)
-        "Borefield with a U-tube borehole configuration"
-        annotation (Placement(transformation(extent={{-10,-70},{10,-50}})));
+        "Inclined Borefield with a U-tube boreholes in circular configuration"
+        annotation (Placement(transformation(extent={{-10,68},{10,88}})));
       IDEAS.Fluid.Sources.MassFlowSource_T sou(
         redeclare package Medium = Medium,
         nPorts=1,
         use_T_in=false,
         m_flow=borFieUTubDat.conDat.mBorFie_flow_nominal,
-        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,-70},{
-                -72,-50}}, rotation=0)));
+        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,68},{-72,
+                88}},      rotation=0)));
       IDEAS.Fluid.Sensors.TemperatureTwoPort TUTubIn(
         redeclare package Medium = Medium,
         m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
         tau=0)
         "Inlet temperature of the borefield with UTube configuration"
-        annotation (Placement(transformation(extent={{-60,-70},{-40,-50}})));
+        annotation (Placement(transformation(extent={{-60,68},{-40,88}})));
       IDEAS.Fluid.Sources.Boundary_pT sin(
         redeclare package Medium = Medium,
         use_p_in=false,
         use_T_in=false,
         nPorts=1,
         p=101330,
-        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,-70},{70,
-                -50}}, rotation=0)));
+        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,68},{70,88}},
+                       rotation=0)));
       IDEAS.Fluid.Sensors.TemperatureTwoPort TUTubOut(
         redeclare package Medium = Medium,
         m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
         tau=0)
         "Inlet temperature of the borefield with UTube configuration"
-        annotation (Placement(transformation(extent={{40,-70},{60,-50}})));
-      parameter IDEAS.Fluid.Geothermal.Borefields.Data.Borefield.Example borFie2UTubSerDat(
-          filDat=IDEAS.Fluid.Geothermal.Borefields.Data.Filling.Bentonite(
-            steadyState=true),
-        conDat=IDEAS.Fluid.Geothermal.Borefields.Data.Configuration.Example(
-        borCon=IDEAS.Fluid.Geothermal.Borefields.Types.BoreholeConfiguration.DoubleUTubeSeries))
-        "Data from the borefield with 2-UTube in serie borehole configuration"
-        annotation (Placement(transformation(extent={{70,20},{90,40}})));
+        annotation (Placement(transformation(extent={{40,68},{60,88}})));
 
+      OneUTube borFieUTubOptimalImport(
+        redeclare package Medium = Medium,
+        temResMatPath=Modelica.Utilities.Files.loadResource("modelica://IDEAS/Resources/Data/Fluid/Geothermal/Borefields/HeatTransfer/temperatureResponseMatrix/customTStepInclined1.mat"),
+        borFieDat=borFieUTubDat,
+        tLoaAgg=tLoaAgg,
+        energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+        TExt0_start=TGro)
+        "Inclined borefield with a U-tube boreholes in 'Optimal' configuration"
+        annotation (Placement(transformation(extent={{-10,34},{10,54}})));
+      Sources.MassFlowSource_T             sou1(
+        redeclare package Medium = Medium,
+        nPorts=1,
+        use_T_in=false,
+        m_flow=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,34},{-72,
+                54}},      rotation=0)));
+      Sensors.TemperatureTwoPort             TUTubIn1(
+        redeclare package Medium = Medium,
+        m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        tau=0)
+        "Inlet temperature of the borefield with UTube configuration"
+        annotation (Placement(transformation(extent={{-60,34},{-40,54}})));
+      Sources.Boundary_pT             sin1(
+        redeclare package Medium = Medium,
+        use_p_in=false,
+        use_T_in=false,
+        nPorts=1,
+        p=101330,
+        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,34},{70,54}},
+                       rotation=0)));
+      Sensors.TemperatureTwoPort             TUTubOut1(
+        redeclare package Medium = Medium,
+        m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        tau=0)
+        "Inlet temperature of the borefield with UTube configuration"
+        annotation (Placement(transformation(extent={{40,34},{60,54}})));
+      OneUTube borFieUTubRectImport(
+        redeclare package Medium = Medium,
+        temResMatPath=Modelica.Utilities.Files.loadResource("modelica://IDEAS/Resources/Data/Fluid/Geothermal/Borefields/HeatTransfer/temperatureResponseMatrix/customTStepRect.mat"),
+        borFieDat=borFieUTubDat,
+        tLoaAgg=tLoaAgg,
+        energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+        TExt0_start=TGro)
+        "Inclined borefield with a U-tube boreholes in 'Optimal' configuration"
+        annotation (Placement(transformation(extent={{-10,0},{10,20}})));
+      Sources.MassFlowSource_T             sou2(
+        redeclare package Medium = Medium,
+        nPorts=1,
+        use_T_in=false,
+        m_flow=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,0},{-72,
+                20}},      rotation=0)));
+      Sensors.TemperatureTwoPort             TUTubIn2(
+        redeclare package Medium = Medium,
+        m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        tau=0)
+        "Inlet temperature of the borefield with UTube configuration"
+        annotation (Placement(transformation(extent={{-60,0},{-40,20}})));
+      Sources.Boundary_pT             sin2(
+        redeclare package Medium = Medium,
+        use_p_in=false,
+        use_T_in=false,
+        nPorts=1,
+        p=101330,
+        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,0},{70,20}},
+                       rotation=0)));
+      Sensors.TemperatureTwoPort             TUTubOut2(
+        redeclare package Medium = Medium,
+        m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        tau=0)
+        "Inlet temperature of the borefield with UTube configuration"
+        annotation (Placement(transformation(extent={{40,0},{60,20}})));
+      IDEAS.Fluid.Geothermal.Borefields.OneUTube borFieUTubRect(
+        redeclare package Medium = Medium,
+        borFieDat=borFieUTubDat,
+        tLoaAgg=tLoaAgg,
+        energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
+        TExt0_start=TGro) "Borefield with a U-tube borehole configuration"
+        annotation (Placement(transformation(extent={{-10,-34},{10,-14}})));
+      Sources.MassFlowSource_T             sou3(
+        redeclare package Medium = Medium,
+        nPorts=1,
+        use_T_in=false,
+        m_flow=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        T=303.15) "Source" annotation (Placement(transformation(extent={{-92,-34},{-72,
+                -14}},     rotation=0)));
+      Sensors.TemperatureTwoPort             TUTubIn3(
+        redeclare package Medium = Medium,
+        m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        tau=0)
+        "Inlet temperature of the borefield with UTube configuration"
+        annotation (Placement(transformation(extent={{-60,-34},{-40,-14}})));
+      Sources.Boundary_pT             sin3(
+        redeclare package Medium = Medium,
+        use_p_in=false,
+        use_T_in=false,
+        nPorts=1,
+        p=101330,
+        T=283.15) "Sink" annotation (Placement(transformation(extent={{90,-34},{70,-14}},
+                       rotation=0)));
+      Sensors.TemperatureTwoPort             TUTubOut3(
+        redeclare package Medium = Medium,
+        m_flow_nominal=borFieUTubDat.conDat.mBorFie_flow_nominal,
+        tau=0)
+        "Inlet temperature of the borefield with UTube configuration"
+        annotation (Placement(transformation(extent={{40,-34},{60,-14}})));
     equation
-      connect(sou1.ports[1], T2UTubParIn.port_a)
-        annotation (Line(points={{-72,0},{-60,0}}, color={0,127,255}));
-      connect(T2UTubParIn.port_b, borFie2UTubPar.port_a)
-        annotation (Line(points={{-40,0},{-10,0}},         color={0,127,255}));
-      connect(T2UTubParOut.port_a, borFie2UTubPar.port_b)
-        annotation (Line(points={{40,0},{10,0}}, color={0,127,255}));
-      connect(T2UTubParOut.port_b, sin1.ports[1])
-        annotation (Line(points={{60,0},{70,0}},        color={0,127,255}));
-      connect(sou2.ports[1], T2UTubSerIn.port_a)
-        annotation (Line(points={{-72,60},{-58,60}}, color={0,127,255}));
-      connect(T2UTubSerIn.port_b, borFie2UTubSer.port_a)
-        annotation (Line(points={{-38,60},{-10,60}},          color={0,127,255}));
-      connect(T2UTubSerOut.port_a, borFie2UTubSer.port_b)
-        annotation (Line(points={{42,60},{10,60}}, color={0,127,255}));
-      connect(T2UTubSerOut.port_b,sin2. ports[1])
-        annotation (Line(points={{62,60},{70,60}},         color={0,127,255}));
       connect(sou.ports[1], TUTubIn.port_a)
-        annotation (Line(points={{-72,-60},{-60,-60}}, color={0,127,255}));
-      connect(TUTubIn.port_b, borFieUTub.port_a)
-        annotation (Line(points={{-40,-60},{-10,-60}}, color={0,127,255}));
-      connect(borFieUTub.port_b, TUTubOut.port_a)
-        annotation (Line(points={{10,-60},{40,-60}},          color={0,127,255}));
+        annotation (Line(points={{-72,78},{-60,78}},   color={0,127,255}));
+      connect(TUTubIn.port_b, borFieUTubCircularImport.port_a)
+        annotation (Line(points={{-40,78},{-10,78}}, color={0,127,255}));
+      connect(borFieUTubCircularImport.port_b, TUTubOut.port_a)
+        annotation (Line(points={{10,78},{40,78}}, color={0,127,255}));
       connect(TUTubOut.port_b, sin.ports[1])
-        annotation (Line(points={{60,-60},{70,-60}},          color={0,127,255}));
+        annotation (Line(points={{60,78},{70,78}},            color={0,127,255}));
+      connect(sou1.ports[1], TUTubIn1.port_a)
+        annotation (Line(points={{-72,44},{-60,44}}, color={0,127,255}));
+      connect(TUTubIn1.port_b, borFieUTubOptimalImport.port_a)
+        annotation (Line(points={{-40,44},{-10,44}}, color={0,127,255}));
+      connect(borFieUTubOptimalImport.port_b, TUTubOut1.port_a)
+        annotation (Line(points={{10,44},{40,44}}, color={0,127,255}));
+      connect(TUTubOut1.port_b, sin1.ports[1])
+        annotation (Line(points={{60,44},{70,44}}, color={0,127,255}));
+      connect(sou2.ports[1],TUTubIn2. port_a)
+        annotation (Line(points={{-72,10},{-60,10}}, color={0,127,255}));
+      connect(TUTubIn2.port_b, borFieUTubRectImport.port_a)
+        annotation (Line(points={{-40,10},{-10,10}}, color={0,127,255}));
+      connect(borFieUTubRectImport.port_b, TUTubOut2.port_a)
+        annotation (Line(points={{10,10},{40,10}}, color={0,127,255}));
+      connect(TUTubOut2.port_b,sin2. ports[1])
+        annotation (Line(points={{60,10},{70,10}}, color={0,127,255}));
+      connect(sou3.ports[1], TUTubIn3.port_a)
+        annotation (Line(points={{-72,-24},{-60,-24}}, color={0,127,255}));
+      connect(TUTubIn3.port_b, borFieUTubRect.port_a)
+        annotation (Line(points={{-40,-24},{-10,-24}}, color={0,127,255}));
+      connect(borFieUTubRect.port_b, TUTubOut3.port_a)
+        annotation (Line(points={{10,-24},{40,-24}}, color={0,127,255}));
+      connect(TUTubOut3.port_b, sin3.ports[1])
+        annotation (Line(points={{60,-24},{70,-24}}, color={0,127,255}));
       annotation (__Dymola_Commands(file="modelica://IDEAS/Resources/Scripts/Dymola/Fluid/Geothermal/Borefields/Examples/Borefields.mos"
             "Simulate and plot"),
       Documentation(info="<html>
@@ -771,7 +783,9 @@ First implementation.
 </ul>
 </html>"),
         experiment(
-          StopTime=36000,Tolerance=1e-6));
+          StopTime=1800000000,
+          Tolerance=1e-06,
+          __Dymola_Algorithm="Dassl"));
     end Borefields;
   annotation (preferredView="info", Documentation(info="<html>
 <p>
