@@ -27,8 +27,9 @@ model PVOrientedDCPower
   Modelica.Units.SI.Velocity wind_speed "Wind speed";
   Modelica.Units.SI.Irradiance G "Total solar irradiance";
 
-  Modelica.Blocks.Math.Add G_glob "Total irradiation on tilted surface"
-    annotation (Placement(transformation(extent={{10,-10},{-10,10}},
+  Modelica.Blocks.Math.Add Gglob "Total irradiation on tilted surface"
+    annotation (Placement(transformation(
+        extent={{10,-10},{-10,10}},
         rotation=90,
         origin={0,10})));
 
@@ -59,7 +60,7 @@ public
     annotation (Placement(transformation(extent={{-31.5,58},{-12.5,74}})));
   Modelica.Blocks.Sources.RealExpression winSpe(y=meaDat.y[10]) "[m/s]"
     annotation (Placement(transformation(extent={{-79.5,26},{-60.5,42}})));
-  Modelica.Blocks.Sources.RealExpression Tamb(y=meaDat.y[12] + 273.15) "[K]"
+  Modelica.Blocks.Sources.RealExpression TAmb(y=meaDat.y[12] + 273.15) "[K]"
     annotation (Placement(transformation(extent={{-79.5,12},{-60.5,28}})));
 equation
   assert(solarPower.y>=0, "Solar power must be positive");
@@ -68,17 +69,17 @@ equation
   heat_loss = 1-module_efficiency/0.9 "We assume a fixed tau alpha of 0.9";
   wind_speed = winSpe.y;
   wind_loss = wind_init/(5.7+3.8*0.51*wind_speed);
-  T_cell=Tamb.y+T_cell_init*heat_loss*wind_loss;
-  G = G_glob.y;
+  T_cell=TAmb.y+T_cell_init*heat_loss*wind_loss;
+  G =Gglob.y;
   T_diff=T_cell-_T_ref;
 
   connect(solarPower.y, reaP.u)
     annotation (Line(points={{68,-40},{-18,-40}}, color={0,0,127}));
   connect(reaP.y, P) annotation (Line(points={{-41,-40},{-80,-40},{-80,0},{-110,
           0}}, color={0,0,127}));
-  connect(Qdir.y, G_glob.u1)
+  connect(Qdir.y, Gglob.u1)
     annotation (Line(points={{-11.55,52},{-6,52},{-6,22}}, color={0,0,127}));
-  connect(Qdif.y, G_glob.u2)
+  connect(Qdif.y, Gglob.u2)
     annotation (Line(points={{-11.55,66},{6,66},{6,22}}, color={0,0,127}));
     annotation (Dialog(group="Characteristics of the photovoltaic installation"),
     Icon(coordinateSystem(
