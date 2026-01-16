@@ -51,6 +51,14 @@ model PVT_UI_Electrical_DayType1
     "[W/m2K]" annotation (Placement(transformation(extent={{15,-84},{41,-68}})));
   Modelica.Blocks.Sources.RealExpression simPel(y=PvtCol.Pel) "[W]"
     annotation (Placement(transformation(extent={{-41,-82},{-15,-66}})));
+  BaseClasses.PVOrientedDCPower pVOrientedDCPower(
+    P_STC=datPvtCol.P_nominal,
+    gamma=datPvtCol.gamma,
+    P_loss_factor=eleLosFac,
+    n=1,
+    module_efficiency=datPvtCol.etaEl,
+    til=0.78539816339745,
+    azi=0) annotation (Placement(transformation(extent={{-72,68},{-92,88}})));
 equation
 
   connect(meaDat.y[13],TFluKel. Celsius) annotation (Line(points={{-71,34},{-60,

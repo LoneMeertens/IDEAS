@@ -50,22 +50,25 @@ public
   outer Modelica.Blocks.Sources.CombiTimeTable meaDat(
     tableOnFile=true,
     tableName="data",
-    fileName=Modelica.Utilities.Files.loadResource(
-        "modelica://PvTfluod/Resources/Validation/MeasurementData/Typ1_modelica.txt"),
+    fileName=Modelica.Utilities.Files.loadResource("modelica://PvTfluod/Resources/Validation/MeasurementData/Typ1_modelica.txt"),
     columns=1:25) annotation (Placement(transformation(extent={{92,72},{72,92}})));
   Modelica.Blocks.Sources.RealExpression Qdir(y=meaDat.y[2] - meaDat.y[3])
     "[W/m2]"                                                                        annotation (Placement(transformation(extent={{-31.5,
             44},{-12.5,60}})));
   Modelica.Blocks.Sources.RealExpression Qdif(y=meaDat.y[3]) "[W/m2]"
     annotation (Placement(transformation(extent={{-31.5,58},{-12.5,74}})));
+  Modelica.Blocks.Sources.RealExpression winSpe(y=meaDat.y[10]) "[m/s]"
+    annotation (Placement(transformation(extent={{-79.5,26},{-60.5,42}})));
+  Modelica.Blocks.Sources.RealExpression Tamb(y=meaDat.y[12] + 273.15) "[K]"
+    annotation (Placement(transformation(extent={{-79.5,12},{-60.5,28}})));
 equation
   assert(solarPower.y>=0, "Solar power must be positive");
   noct_adj=_noct+6 "We assume an average distance between the panel and roof of 1.5-2.5 in.";
   T_cell_init=G/800*(noct_adj-293) "in Kelvin";
   heat_loss = 1-module_efficiency/0.9 "We assume a fixed tau alpha of 0.9";
-  wind_speed = sim.Va;
+  wind_speed = winSpe.y;
   wind_loss = wind_init/(5.7+3.8*0.51*wind_speed);
-  T_cell=sim.Te+T_cell_init*heat_loss*wind_loss;
+  T_cell=Tamb.y+T_cell_init*heat_loss*wind_loss;
   G = G_glob.y;
   T_diff=T_cell-_T_ref;
 
