@@ -1,4 +1,4 @@
-﻿within IDEAS.Fluid.PVTCollectors.Validation.PVT_UN;
+within IDEAS.Fluid.PVTCollectors.Validation.PVT_UN;
 model PVT_UN_Electrical
   "Electrical Behavior of Unglazed Rear-Non-Insulated PVT Collector"
   extends Modelica.Icons.Example;
@@ -52,6 +52,16 @@ model PVT_UN_Electrical
     "[W/m2K]" annotation (Placement(transformation(extent={{17,-82},{43,-66}})));
   Modelica.Blocks.Sources.RealExpression simPel(y=PvtCol.Pel) "[W]"
     annotation (Placement(transformation(extent={{-39,-80},{-13,-64}})));
+  BaseClasses.ElectricalPV electricalPV(
+    P_STC=datPvtCol.P_nominal,
+    gamma=datPvtCol.gamma,
+    eleLosFac=eleLosFac,
+    n=1,
+    module_efficiency=datPvtCol.etaEl,
+    til=0.34906585039887,
+    azi=0) annotation (Placement(transformation(extent={{-84,68},{-64,88}})));
+  Modelica.Blocks.Sources.RealExpression simPelPV(y=electricalPV.P) "[W]"
+    annotation (Placement(transformation(extent={{-57,68},{-31,84}})));
 equation
   connect(bou.T_in,TFluKel. Kelvin)
     annotation (Line(points={{-60,4},{-76.5,4}}, color={0,0,127}));
@@ -128,7 +138,8 @@ UAbsFluid
           horizontalAlignment=TextAlignment.Left,
           textStyle={TextStyle.Bold},
           textString="Measured and simulated
-electrical power")}),
+electrical power"),
+        Rectangle(extent={{-90,96},{-18,60}},   lineColor={28,108,200})}),
 __Dymola_Commands(file="modelica://IDEAS/Resources/Scripts/Dymola/Fluid/PVTCollectors/Validation/PVT_UN/PVT_UN_Electrical.mos"
         "Simulate and plot"),
  experiment(
