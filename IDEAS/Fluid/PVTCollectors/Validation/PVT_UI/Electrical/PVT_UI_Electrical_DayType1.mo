@@ -58,7 +58,9 @@ model PVT_UI_Electrical_DayType1
     n=1,
     module_efficiency=datPvtCol.etaEl,
     til=0.78539816339745,
-    azi=0) annotation (Placement(transformation(extent={{-72,68},{-92,88}})));
+    azi=0) annotation (Placement(transformation(extent={{-68,68},{-88,88}})));
+  Modelica.Blocks.Sources.RealExpression simPelPV(y=electricalPV.P) "[W]"
+    annotation (Placement(transformation(extent={{-51,70},{-25,86}})));
 equation
 
   connect(meaDat.y[13],TFluKel. Celsius) annotation (Line(points={{-71,34},{-60,
@@ -113,5 +115,6 @@ UAbsFluid
           horizontalAlignment=TextAlignment.Left,
           textStyle={TextStyle.Bold},
           textString="Measured and simulated
-electrical power")}));
+electrical power"),
+        Rectangle(extent={{-90,94},{-18,58}},   lineColor={28,108,200})}));
 end PVT_UI_Electrical_DayType1;
