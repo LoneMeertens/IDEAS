@@ -1,4 +1,4 @@
-within IDEAS.Fluid.PVTCollectors.Validation.BaseClasses;
+within IDEAS.Fluid.PVTCollectors.Validation.PVT_UI.BaseClasses;
 record UI_Validation =
   IDEAS.Fluid.PVTCollectors.Data.GenericQuasiDynamic(
     final A=1.66,

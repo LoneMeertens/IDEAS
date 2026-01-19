@@ -1,4 +1,4 @@
-within IDEAS.Fluid.PVTCollectors.Validation.BaseClasses;
+within IDEAS.Fluid.PVTCollectors.Validation.PVT_UN.BaseClasses;
 model ElectricalPV
   "Model for a photovoltaic panels using PV-oriented cell-temperature equations"
 

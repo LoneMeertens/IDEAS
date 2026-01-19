@@ -8,7 +8,9 @@ model PVT_UI_Thermal_DayType1
   parameter Real eleLosFac = 0.09;
   parameter Data.Uncovered.UI_Validation datPVTCol
     annotation (Placement(transformation(extent={{72,-6},{92,14}})));
-  parameter IDEAS.Fluid.PVTCollectors.Validation.BaseClasses.UI_Validation datPVTColVal
+  parameter
+    IDEAS.Fluid.PVTCollectors.Validation.PVT_UI.BaseClasses.UI_Validation
+    datPVTColVal
     annotation (Placement(transformation(extent={{72,-36},{92,-16}})));
 
   IDEAS.Fluid.PVTCollectors.Validation.PVT_UI.PVTQuasiDynamicCollectorValidation

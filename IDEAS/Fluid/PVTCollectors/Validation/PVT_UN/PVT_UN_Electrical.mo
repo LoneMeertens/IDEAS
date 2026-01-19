@@ -52,7 +52,8 @@ model PVT_UN_Electrical
     "[W/m2K]" annotation (Placement(transformation(extent={{17,-82},{43,-66}})));
   Modelica.Blocks.Sources.RealExpression simPel(y=PvtCol.Pel) "[W]"
     annotation (Placement(transformation(extent={{-39,-80},{-13,-64}})));
-  BaseClasses.ElectricalPV electricalPV(
+  .IDEAS.Fluid.PVTCollectors.Validation.PVT_UN.BaseClasses.ElectricalPV
+    electricalPV(
     P_STC=datPVTCol.P_nominal,
     gamma=datPVTCol.gamma,
     eleLosFac=eleLosFac,
