@@ -41,10 +41,10 @@ model PVT_UN_Electrical
     rho=0.2,
     nColType=IDEAS.Fluid.SolarCollectors.Types.NumberSelection.Number,
     nPanels=1,
-    per=datPvtCol,
+    per=datPVTCol,
     eleLosFac=eleLosFac)
     annotation (Placement(transformation(extent={{-8,-10},{12,10}})));
-  parameter Data.Uncovered.UN_Validation datPvtCol
+  parameter Data.Uncovered.UN_Validation datPVTCol
     annotation (Placement(transformation(extent={{66,54},{86,74}})));
   Modelica.Blocks.Sources.RealExpression meaPel(y=meaDat.y[19]) "[W]"
     annotation (Placement(transformation(extent={{-75,-80},{-49,-64}})));
@@ -53,11 +53,11 @@ model PVT_UN_Electrical
   Modelica.Blocks.Sources.RealExpression simPel(y=PvtCol.Pel) "[W]"
     annotation (Placement(transformation(extent={{-39,-80},{-13,-64}})));
   BaseClasses.ElectricalPV electricalPV(
-    P_STC=datPvtCol.P_nominal,
-    gamma=datPvtCol.gamma,
+    P_STC=datPVTCol.P_nominal,
+    gamma=datPVTCol.gamma,
     eleLosFac=eleLosFac,
     n=1,
-    module_efficiency=datPvtCol.etaEl,
+    module_efficiency=datPVTCol.etaEl,
     til=0.34906585039887,
     azi=0) annotation (Placement(transformation(extent={{-84,68},{-64,88}})));
   Modelica.Blocks.Sources.RealExpression simPelPV(y=electricalPV.P) "[W]"

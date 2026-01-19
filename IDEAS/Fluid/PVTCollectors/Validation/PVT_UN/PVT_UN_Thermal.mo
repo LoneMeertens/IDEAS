@@ -1,4 +1,4 @@
-﻿within IDEAS.Fluid.PVTCollectors.Validation.PVT_UN;
+within IDEAS.Fluid.PVTCollectors.Validation.PVT_UN;
 model PVT_UN_Thermal
   "Thermal Behavior of Unglazed Rear-Non-Insulated PVT Collector"
   extends Modelica.Icons.Example;
@@ -56,10 +56,10 @@ model PVT_UN_Thermal
     rho=0.2,
     nColType=IDEAS.Fluid.SolarCollectors.Types.NumberSelection.Number,
     nPanels=1,
-    per=datPvtCol,
+    per=datPVTCol,
     eleLosFac=eleLosFac)
     annotation (Placement(transformation(extent={{-8,-10},{12,10}})));
-  parameter Data.Uncovered.UN_Validation datPvtCol
+  parameter Data.Uncovered.UN_Validation datPVTCol
     annotation (Placement(transformation(extent={{66,54},{86,74}})));
 equation
   connect(bou.T_in,TFluKel. Kelvin)
