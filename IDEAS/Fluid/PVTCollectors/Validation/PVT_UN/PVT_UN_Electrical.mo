@@ -45,13 +45,13 @@ model PVT_UN_Electrical
     eleLosFac=eleLosFac)
     annotation (Placement(transformation(extent={{-8,-10},{12,10}})));
   parameter Data.Uncovered.UN_Validation datPVTCol
-    annotation (Placement(transformation(extent={{66,54},{86,74}})));
+    annotation (Placement(transformation(extent={{72,-6},{92,14}})));
   Modelica.Blocks.Sources.RealExpression meaPel(y=meaDat.y[19]) "[W]"
-    annotation (Placement(transformation(extent={{-75,-80},{-49,-64}})));
+    annotation (Placement(transformation(extent={{-83,58},{-57,74}})));
   Modelica.Blocks.Sources.RealExpression UAbsFluid(y=PvtCol.eleGen.UAbsFluid)
-    "[W/m2K]" annotation (Placement(transformation(extent={{17,-82},{43,-66}})));
+    "[W/m2K]" annotation (Placement(transformation(extent={{9,56},{35,72}})));
   Modelica.Blocks.Sources.RealExpression simPel(y=PvtCol.Pel) "[W]"
-    annotation (Placement(transformation(extent={{-39,-80},{-13,-64}})));
+    annotation (Placement(transformation(extent={{-47,58},{-21,74}})));
   .IDEAS.Fluid.PVTCollectors.Validation.PVT_UN.BaseClasses.ElectricalPV
     electricalPV(
     P_STC=datPVTCol.P_nominal,
@@ -60,9 +60,9 @@ model PVT_UN_Electrical
     n=1,
     module_efficiency=datPVTCol.etaEl,
     til=0.34906585039887,
-    azi=0) annotation (Placement(transformation(extent={{-84,68},{-64,88}})));
+    azi=0) annotation (Placement(transformation(extent={{-84,-76},{-64,-56}})));
   Modelica.Blocks.Sources.RealExpression simPelPV(y=electricalPV.P) "[W]"
-    annotation (Placement(transformation(extent={{-57,68},{-31,84}})));
+    annotation (Placement(transformation(extent={{-57,-76},{-31,-60}})));
 equation
   connect(bou.T_in,TFluKel. Kelvin)
     annotation (Line(points={{-60,4},{-76.5,4}}, color={0,0,127}));
@@ -124,23 +124,23 @@ This is for <a href=\"https://github.com/open-ideas/IDEAS/issues/1436\">#1436</a
 </html>"),
    Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false), graphics={
-        Rectangle(extent={{14,-42},{48,-82}}, lineColor={28,108,200}),
+        Rectangle(extent={{6,96},{40,56}},    lineColor={28,108,200}),
         Text(
-          extent={{10,-44},{50,-62}},
+          extent={{2,94},{42,76}},
           textColor={28,108,200},
           textStyle={TextStyle.Bold},
           textString="Calculated 
 UAbsFluid 
 [W/m2K]"),
-        Rectangle(extent={{-80,-44},{-8,-80}},  lineColor={28,108,200}),
+        Rectangle(extent={{-88,94},{-16,58}},   lineColor={28,108,200}),
         Text(
-          extent={{-78,-38},{-12,-66}},
+          extent={{-86,100},{-20,72}},
           textColor={28,108,200},
           horizontalAlignment=TextAlignment.Left,
           textStyle={TextStyle.Bold},
           textString="Measured and simulated
 electrical power"),
-        Rectangle(extent={{-90,96},{-18,60}},   lineColor={28,108,200})}),
+        Rectangle(extent={{-90,-48},{-18,-84}}, lineColor={28,108,200})}),
 __Dymola_Commands(file="modelica://IDEAS/Resources/Scripts/Dymola/Fluid/PVTCollectors/Validation/PVT_UN/PVT_UN_Electrical.mos"
         "Simulate and plot"),
  experiment(
