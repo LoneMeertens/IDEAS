@@ -13,23 +13,23 @@ model PVT_UN_Electrical
     tableOnFile=true,
     tableName="data",
     fileName=Modelica.Utilities.Files.loadResource("modelica://IDEAS/Resources/Data/Fluid/PVTCollectors/Validation/PVT_UN/PVT_UN_measurements_"+week+".txt"),
-    columns=1:26) annotation (Placement(transformation(extent={{-92,24},{-72,44}})));
+    columns=1:26) annotation (Placement(transformation(extent={{-92,14},{-72,34}})));
 
-  Modelica.Thermal.HeatTransfer.Celsius.ToKelvin TFluKel annotation (Placement(transformation(extent={{-87,-1},
-            {-77,9}})));
+  Modelica.Thermal.HeatTransfer.Celsius.ToKelvin TFluKel annotation (Placement(transformation(extent={{-87,-11},
+            {-77,-1}})));
   IDEAS.Fluid.Sources.Boundary_pT sou(
     redeclare package Medium = Medium,
     use_p_in=false,
     p(displayUnit="Pa") = 101325,
     nPorts=1) "Outlet for water flow"
-    annotation (Placement(transformation(extent={{62,-10},{42,10}})));
+    annotation (Placement(transformation(extent={{62,-20},{42,0}})));
   IDEAS.Fluid.Sources.MassFlowSource_T bou(
     redeclare package Medium = Medium,
     use_m_flow_in=true,
     m_flow=0.03,
     use_T_in=true,
     nPorts=1) "Inlet for water flow, at a prescribed flow rate and temperature"
-    annotation (Placement(transformation(extent={{-58,-10},{-38,10}})));
+    annotation (Placement(transformation(extent={{-58,-20},{-38,0}})));
   IDEAS.Fluid.PVTCollectors.Validation.PVT_UN.PVTQuasiDynamicCollectorValidation
     PvtCol(
     redeclare package Medium = Medium,
@@ -43,9 +43,9 @@ model PVT_UN_Electrical
     nPanels=1,
     per=datPVTCol,
     eleLosFac=eleLosFac)
-    annotation (Placement(transformation(extent={{-8,-10},{12,10}})));
+    annotation (Placement(transformation(extent={{-8,-20},{12,0}})));
   parameter Data.Uncovered.UN_Validation datPVTCol
-    annotation (Placement(transformation(extent={{72,-6},{92,14}})));
+    annotation (Placement(transformation(extent={{72,-16},{92,4}})));
   Modelica.Blocks.Sources.RealExpression meaPel(y=meaDat.y[19]) "[W]"
     annotation (Placement(transformation(extent={{-83,58},{-57,74}})));
   Modelica.Blocks.Sources.RealExpression UAbsFluid(y=PvtCol.eleGen.UAbsFluid)
@@ -60,20 +60,30 @@ model PVT_UN_Electrical
     n=1,
     module_efficiency=datPVTCol.etaEl,
     til=0.34906585039887,
-    azi=0) annotation (Placement(transformation(extent={{-84,-76},{-64,-56}})));
+    azi=0) annotation (Placement(transformation(extent={{-64,-72},{-84,-54}})));
   Modelica.Blocks.Sources.RealExpression simPelPV(y=electricalPV.P) "[W]"
-    annotation (Placement(transformation(extent={{-57,-76},{-31,-60}})));
+    annotation (Placement(transformation(extent={{-53,-68},{-27,-52}})));
+  Modelica.Blocks.Sources.RealExpression simTcell(y=PvtCol.eleGen.TavgCel -
+        273.15) "[°C]"
+    annotation (Placement(transformation(extent={{-47,44},{-21,60}})));
+  Modelica.Blocks.Sources.RealExpression simTcellPV(y=ElectricalPV.T_cell -
+        273.15) "[°C]"
+    annotation (Placement(transformation(extent={{-53,-82},{-27,-66}})));
 equation
   connect(bou.T_in,TFluKel. Kelvin)
-    annotation (Line(points={{-60,4},{-76.5,4}}, color={0,0,127}));
+    annotation (Line(points={{-60,-6},{-76.5,-6}},
+                                                 color={0,0,127}));
   connect(PvtCol.port_a, bou.ports[1])
-    annotation (Line(points={{-8,0},{-38,0}}, color={0,127,255}));
+    annotation (Line(points={{-8,-10},{-38,-10}},
+                                              color={0,127,255}));
   connect(PvtCol.port_b, sou.ports[1])
-    annotation (Line(points={{12,0},{42,0}}, color={0,127,255}));
+    annotation (Line(points={{12,-10},{42,-10}},
+                                             color={0,127,255}));
   connect(bou.m_flow_in, meaDat.y[3])
-    annotation (Line(points={{-60,8},{-60,34},{-71,34}}, color={0,0,127}));
-  connect(meaDat.y[2],TFluKel. Celsius) annotation (Line(points={{-71,34},{-60,34},
-          {-60,16},{-92,16},{-92,4},{-88,4}}, color={0,0,127}));
+    annotation (Line(points={{-60,-2},{-60,24},{-71,24}},color={0,0,127}));
+  connect(meaDat.y[2],TFluKel. Celsius) annotation (Line(points={{-71,24},{-60,
+          24},{-60,6},{-92,6},{-92,-6},{-88,-6}},
+                                              color={0,0,127}));
   annotation (Documentation(info =    "<html>
 <p>
 This model validates the electrical performance of the 
@@ -132,7 +142,7 @@ This is for <a href=\"https://github.com/open-ideas/IDEAS/issues/1436\">#1436</a
           textString="Calculated 
 UAbsFluid 
 [W/m2K]"),
-        Rectangle(extent={{-88,94},{-16,58}},   lineColor={28,108,200}),
+        Rectangle(extent={{-88,94},{-14,46}},   lineColor={28,108,200}),
         Text(
           extent={{-86,100},{-20,72}},
           textColor={28,108,200},
