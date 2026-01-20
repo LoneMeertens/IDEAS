@@ -48,7 +48,7 @@ model PVT_UI_Electrical_DayType1
   Modelica.Blocks.Sources.RealExpression meaPel(y=meaDat.y[21]) "[W]"
     annotation (Placement(transformation(extent={{-87,52},{-61,68}})));
   Modelica.Blocks.Sources.RealExpression UAbsFluid(y=PvtCol.eleGen.UAbsFluid)
-    "[W/m2K]" annotation (Placement(transformation(extent={{5,50},{31,66}})));
+    "[W/m2K]" annotation (Placement(transformation(extent={{11,46},{37,62}})));
   Modelica.Blocks.Sources.RealExpression simPel(y=PvtCol.Pel) "[W]"
     annotation (Placement(transformation(extent={{-51,52},{-25,68}})));
   IDEAS.Fluid.PVTCollectors.Validation.PVT_UI.BaseClasses.ElectricalPV ElectricalPV(
@@ -60,7 +60,13 @@ model PVT_UI_Electrical_DayType1
     til=0.78539816339745,
     azi=0) annotation (Placement(transformation(extent={{-60,-82},{-80,-62}})));
   Modelica.Blocks.Sources.RealExpression simPelPV(y=ElectricalPV.P) "[W]"
-    annotation (Placement(transformation(extent={{-49,-80},{-23,-64}})));
+    annotation (Placement(transformation(extent={{-49,-74},{-23,-58}})));
+  Modelica.Blocks.Sources.RealExpression simTcellPV(y=ElectricalPV.T_cell -
+        273.15) "[°C]"
+    annotation (Placement(transformation(extent={{-49,-92},{-23,-76}})));
+  Modelica.Blocks.Sources.RealExpression simTcell(y=PvtCol.eleGen.TavgCel -
+        273.15) "[°C]"
+    annotation (Placement(transformation(extent={{-51,40},{-25,56}})));
 equation
 
   connect(meaDat.y[13],TFluKel. Celsius) annotation (Line(points={{-71,14},{-60,
@@ -104,15 +110,15 @@ __Dymola_Commands(file="modelica://IDEAS/Resources/Scripts/Dymola/Fluid/PVTColle
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Diagram(graphics={
-        Rectangle(extent={{2,90},{36,50}},    lineColor={28,108,200}),
+        Rectangle(extent={{8,86},{42,46}},    lineColor={28,108,200}),
         Text(
-          extent={{-2,88},{38,70}},
+          extent={{4,84},{44,66}},
           textColor={28,108,200},
           textStyle={TextStyle.Bold},
           textString="Calculated 
 UAbsFluid 
 [W/m2K]"),
-        Rectangle(extent={{-92,88},{-20,52}},   lineColor={28,108,200}),
+        Rectangle(extent={{-92,88},{-18,42}},   lineColor={28,108,200}),
         Text(
           extent={{-90,94},{-24,66}},
           textColor={28,108,200},
