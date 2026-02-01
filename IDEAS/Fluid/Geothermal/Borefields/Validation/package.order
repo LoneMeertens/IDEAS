@@ -3,4 +3,6 @@ Sandbox
 BaseClasses
 SpreadsheetTests
 Functions
-BorefieldsDynamicFluidProperties
+BorefieldsDynamicFluidProperties_water
+ConvectionCalculatorDynamic
+BorefieldsDynamicFluidProperties_glycol
