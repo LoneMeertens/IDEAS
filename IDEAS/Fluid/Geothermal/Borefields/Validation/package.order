@@ -1,8 +1,6 @@
 ConstantHeatInjection_100Boreholes
 Sandbox
-BaseClasses
 SpreadsheetTests
 Functions
-BorefieldsDynamicFluidProperties_water
-ConvectionCalculatorDynamic
-BorefieldsDynamicFluidProperties_glycol
+BorefieldsDynamicFluidProperties_glycol_injection
+BorefieldsDynamicFluidProperties_water_injection
