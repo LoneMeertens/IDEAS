@@ -1,7 +1,6 @@
 within IDEAS.Fluid.Geothermal.Borefields.Validation.Functions;
 function convectionResistanceCircularPipe
   "Thermal resistance from the fluid in pipes and the grout zones (Bauer et al. 2011)"
-  import Buildings;
   extends Modelica.Icons.Function;
 
   // Geometry of the borehole
@@ -32,7 +31,7 @@ protected
   Real k(unit="s/kg")
     "Coefficient used in the computation of the convective heat transfer coefficient";
   Modelica.Units.SI.MassFlowRate m_flow_abs=
-      Buildings.Utilities.Math.Functions.spliceFunction(
+      IDEAS.Utilities.Math.Functions.spliceFunction(
       m_flow,
       -m_flow,
       m_flow,
@@ -49,7 +48,7 @@ algorithm
     // Re = rho*v*DTub / mue_f
     //    = m_flow/(pi r^2) * DTub/mue_f = 2*m_flow / ( mue*pi*rTub)
     Nu := 0.023*(cpMed*muMed/kMed)^(0.35)*
-      Buildings.Utilities.Math.Functions.regNonZeroPower(
+      IDEAS.Utilities.Math.Functions.regNonZeroPower(
         x=Re,
         n=0.8,
         delta=0.01*m_flow_nominal*k);
@@ -58,7 +57,7 @@ algorithm
     // imposed temperature: Nu=3.66 for Re<=2300. For 2300<Re<2400, a smooth
     // transition is created with the splice function.
     NuTurb := 0.023*(cpMed*muMed/kMed)^(0.35)*(2400)^(0.8);
-    Nu := Buildings.Utilities.Math.Functions.spliceFunction(NuTurb,3.66,Re-(2300+2400)/2,((2300+2400)/2)-2300);
+    Nu := IDEAS.Utilities.Math.Functions.spliceFunction(NuTurb,3.66,Re-(2300+2400)/2,((2300+2400)/2)-2300);
   end if;
   h := Nu*kMed/(2*rTub_in);
 
